@@ -1,0 +1,549 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --c1:#1a1a2e;--acc:#e94560;--acc2:#53c28b;--acc3:#f5a623;
+    --txt:#e0e0e0;--txt2:#a0a0b0;--card:#1e2a4a;--border:#2a3a5e;
+    --font-display:'Orbitron',monospace;--font-body:'Space Grotesk',sans-serif;
+  }
+  body{background:var(--c1);color:var(--txt);font-family:var(--font-body);min-height:100vh;padding:0}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .screen{display:none;padding:1.5rem 1rem;min-height:400px}
+  .screen.active{display:block}
+  .logo{font-family:var(--font-display);font-size:1.6rem;color:var(--acc);text-align:center;letter-spacing:2px;margin-bottom:.5rem}
+  .subtitle{text-align:center;color:var(--txt2);font-size:.9rem;margin-bottom:2rem}
+  .circuit-line{width:80%;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent);margin:1rem auto}
+  .name-input-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:400px;margin:0 auto 1.5rem}
+  .name-input-wrap label{display:block;color:var(--txt2);font-size:.85rem;margin-bottom:.5rem}
+  .name-input-wrap input{width:100%;background:#0d1b38;border:1px solid var(--border);border-radius:8px;color:var(--txt);padding:.7rem 1rem;font-size:1rem;font-family:var(--font-body);outline:none;transition:border-color .2s}
+  .name-input-wrap input:focus{border-color:var(--acc)}
+  .btn-start{display:block;width:fit-content;margin:0 auto;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:.8rem 2.5rem;font-size:1rem;font-family:var(--font-body);font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .btn-start:hover{transform:scale(1.04);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+  .rules{max-width:420px;margin:1.5rem auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+  .rules h3{font-size:.75rem;color:var(--acc3);margin-bottom:.7rem;font-family:var(--font-display);letter-spacing:1px}
+  .rules ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+  .rules li{font-size:.82rem;color:var(--txt2);display:flex;align-items:center;gap:.5rem}
+  .rules li::before{content:'▶';color:var(--acc);font-size:.6rem}
+  .hud{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.7rem 1.1rem;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+  .hud-item{display:flex;flex-direction:column;align-items:center;gap:1px}
+  .hud-label{font-size:.65rem;color:var(--txt2);letter-spacing:1px;text-transform:uppercase}
+  .hud-val{font-family:var(--font-display);font-size:1rem;color:var(--acc)}
+  .hud-val.green{color:var(--acc2)}
+  .hud-val.amber{color:var(--acc3)}
+  .progress-bar{height:4px;background:#0d1b38;border-radius:2px;overflow:hidden;margin-bottom:.8rem}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc3));border-radius:2px;transition:width .4s ease}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1rem}
+  .q-type-badge{display:inline-block;background:#0d1b38;border:1px solid var(--border);color:var(--txt2);font-size:.68rem;padding:.2rem .6rem;border-radius:20px;margin-bottom:.8rem;letter-spacing:.5px}
+  .q-text{font-size:.97rem;line-height:1.6;color:var(--txt);margin-bottom:1rem;font-weight:500}
+  .pts-badge{font-size:.75rem;color:var(--acc3);margin-bottom:.8rem}
+  .options{display:flex;flex-direction:column;gap:.55rem}
+  .option-btn{background:#0d1b38;border:1px solid var(--border);border-radius:10px;color:var(--txt);padding:.75rem 1rem;font-size:.9rem;font-family:var(--font-body);cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.7rem}
+  .option-btn:hover:not(:disabled){border-color:var(--acc);background:#13233f}
+  .option-btn .opt-letter{width:26px;height:26px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;flex-shrink:0}
+  .option-btn.correct{border-color:var(--acc2);background:rgba(83,194,139,.1)}
+  .option-btn.correct .opt-letter{background:var(--acc2);color:#fff}
+  .option-btn.wrong{border-color:var(--acc);background:rgba(233,69,96,.1)}
+  .option-btn.wrong .opt-letter{background:var(--acc);color:#fff}
+  .option-btn:disabled{cursor:default;opacity:.8}
+  .tf-wrap{display:flex;gap:.8rem}
+  .tf-btn{flex:1;background:#0d1b38;border:1px solid var(--border);border-radius:10px;color:var(--txt);padding:.9rem;font-size:.95rem;font-family:var(--font-body);cursor:pointer;font-weight:600;transition:all .15s;text-align:center}
+  .tf-btn:hover:not(:disabled){border-color:var(--acc3)}
+  .tf-btn.correct{border-color:var(--acc2);background:rgba(83,194,139,.15);color:var(--acc2)}
+  .tf-btn.wrong{border-color:var(--acc);background:rgba(233,69,96,.15);color:var(--acc)}
+  .tf-btn:disabled{cursor:default}
+  /* SÍMBOLOS — sin nombre, solo el dibujo */
+  .symbol-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem}
+  .sym-btn{background:#0d1b38;border:2px solid var(--border);border-radius:14px;padding:1rem .5rem;cursor:pointer;text-align:center;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .sym-btn:hover:not(:disabled){border-color:var(--acc3);background:#13233f;transform:scale(1.03)}
+  .sym-btn.correct{border-color:var(--acc2);background:rgba(83,194,139,.12)}
+  .sym-btn.wrong{border-color:var(--acc);background:rgba(233,69,96,.1)}
+  .sym-btn:disabled{cursor:default;transform:none}
+  .sym-btn svg{width:120px;height:68px;display:block}
+  /* Etiqueta revelada tras responder */
+  .sym-label{font-size:.75rem;color:var(--acc2);margin-top:.35rem;display:none;font-weight:600}
+  .sym-btn.correct .sym-label,.sym-btn.wrong .sym-label{display:block}
+  .sym-btn.correct .sym-label{color:var(--acc2)}
+  .sym-btn.wrong .sym-label{color:var(--txt2)}
+  .feedback{border-radius:10px;padding:.75rem 1rem;margin-top:.8rem;font-size:.88rem;line-height:1.5;display:none}
+  .feedback.show{display:block}
+  .feedback.correct{background:rgba(83,194,139,.12);border:1px solid rgba(83,194,139,.3);color:#7edba5}
+  .feedback.wrong{background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.3);color:#f08090}
+  .feedback strong{font-weight:600}
+  .pts-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--acc2);color:#fff;border-radius:16px;padding:.7rem 1.5rem;font-family:var(--font-display);font-size:1.3rem;font-weight:700;z-index:999;transition:transform .2s,opacity .3s;opacity:0;pointer-events:none}
+  .pts-popup.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+  .btn-next{display:block;width:100%;margin-top:1rem;background:transparent;border:1px solid var(--acc);color:var(--acc);border-radius:10px;padding:.7rem;font-size:.9rem;font-family:var(--font-body);font-weight:600;cursor:pointer;transition:background .15s}
+  .btn-next:hover{background:rgba(233,69,96,.1)}
+  .btn-next:disabled{opacity:.35;cursor:default}
+  .result-hero{text-align:center;padding:1.5rem 0}
+  .result-grade{font-family:var(--font-display);font-size:3rem;color:var(--acc);margin-bottom:.3rem}
+  .result-name{font-size:1rem;color:var(--txt2);margin-bottom:.5rem}
+  .result-sub{font-size:.85rem;color:var(--txt2)}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:1.2rem 0}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem;text-align:center}
+  .stat-num{font-family:var(--font-display);font-size:1.5rem;color:var(--acc3)}
+  .stat-lbl{font-size:.7rem;color:var(--txt2);margin-top:2px}
+  .answers-review{margin-top:1rem}
+  .review-title{font-size:.8rem;color:var(--txt2);margin-bottom:.8rem;letter-spacing:.5px;text-transform:uppercase}
+  .review-item{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--txt2)}
+  .review-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;margin-top:1px}
+  .review-icon.ok{background:rgba(83,194,139,.2);color:var(--acc2)}
+  .review-icon.ko{background:rgba(233,69,96,.2);color:var(--acc)}
+  .btn-export{display:block;width:100%;margin-top:1.2rem;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-family:var(--font-body);font-weight:700;cursor:pointer;transition:opacity .15s}
+  .btn-export:hover{opacity:.88}
+  .btn-restart{display:block;width:100%;margin-top:.6rem;background:transparent;border:1px solid var(--border);color:var(--txt2);border-radius:10px;padding:.75rem;font-size:.9rem;font-family:var(--font-body);cursor:pointer;transition:background .15s}
+  .btn-restart:hover{background:var(--card)}
+  .stars{font-size:1.8rem;margin-bottom:.5rem;letter-spacing:4px}
+  /* Problema numérico */
+  .problema-box{background:#0d1b38;border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;font-size:.88rem;color:var(--txt2);line-height:1.7}
+  .problema-box strong{color:var(--acc3)}
+</style>
+
+<h2 class="sr-only">Juego interactivo de repaso: Electrónica 3º ESO</h2>
+<div class="pts-popup" id="ptsPopup"></div>
+
+<!-- WELCOME -->
+<div class="screen active" id="screen-welcome">
+  <div class="logo">⚡ ELECTROQUIZ</div>
+  <div class="subtitle">Repaso · Electrónica Analógica · 3º ESO</div>
+  <div class="circuit-line"></div>
+  <div class="name-input-wrap">
+    <label for="playerName">¿Cuál es tu nombre, estudiante?</label>
+    <input type="text" id="playerName" placeholder="Escribe tu nombre..." maxlength="30"/>
+  </div>
+  <button class="btn-start" onclick="startGame()">Comenzar el reto ⚡</button>
+  <div class="rules">
+    <h3>📋 INSTRUCCIONES</h3>
+    <ul>
+      <li>Preguntas de V/F, elección múltiple, símbolos y problemas</li>
+      <li>En los símbolos: ¡identifica el dibujo sin pistas!</li>
+      <li>Gana puntos por cada respuesta correcta</li>
+      <li>Feedback inmediato con explicación en cada pregunta</li>
+      <li>Al final exporta tu resultado en PDF</li>
+    </ul>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="hud">
+    <div class="hud-item"><span class="hud-label">Alumno</span><span class="hud-val" id="hudName" style="font-family:var(--font-body);font-size:.9rem">—</span></div>
+    <div class="hud-item"><span class="hud-label">Pregunta</span><span class="hud-val" id="hudQ">1/38</span></div>
+    <div class="hud-item"><span class="hud-label">Puntos</span><span class="hud-val green" id="hudPts">0</span></div>
+    <div class="hud-item"><span class="hud-label">Aciertos</span><span class="hud-val amber" id="hudCorrect">0</span></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="q-card" id="qCard"></div>
+  <div class="feedback" id="feedback"></div>
+  <button class="btn-next" id="btnNext" onclick="nextQuestion()" disabled>Siguiente pregunta →</button>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <div class="result-hero">
+    <div class="stars" id="resultStars">⭐⭐⭐</div>
+    <div class="result-grade" id="resultGrade">0</div>
+    <div id="resultName" class="result-name"></div>
+    <div id="resultSub" class="result-sub"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="sCorrect">0</div><div class="stat-lbl">Correctas</div></div>
+    <div class="stat-card"><div class="stat-num" id="sWrong">0</div><div class="stat-lbl">Incorrectas</div></div>
+    <div class="stat-card"><div class="stat-num" id="sPct">0%</div><div class="stat-lbl">Porcentaje</div></div>
+  </div>
+  <div class="answers-review">
+    <div class="review-title">Resumen de respuestas</div>
+    <div id="reviewList"></div>
+  </div>
+  <button class="btn-export" onclick="exportPDF()">⬇ Exportar resultado en PDF</button>
+  <button class="btn-restart" onclick="restartGame()">↺ Volver a intentarlo</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ── SVG SÍMBOLOS (sin nombre visible durante el juego) ──────────────────────
+const SYM = {
+  ldr:{name:'LDR',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="24" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <rect x="24" y="20" width="72" height="28" rx="4" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="96" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="40" y1="62" x2="56" y2="44" stroke="#f5a623" stroke-width="2.5" marker-end="url(#al)"/>
+    <line x1="58" y1="62" x2="74" y2="44" stroke="#f5a623" stroke-width="2.5" marker-end="url(#al)"/>
+    <defs><marker id="al" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f5a623"/></marker></defs>
+  </svg>`},
+  cap:{name:'Condensador',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="50" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="50" y1="10" x2="50" y2="58" stroke="#53c28b" stroke-width="5.5"/>
+    <line x1="70" y1="10" x2="70" y2="58" stroke="#53c28b" stroke-width="5.5"/>
+    <line x1="70" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+  </svg>`},
+  diode:{name:'Diodo rectificador',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="28" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <polygon points="28,12 28,56 76,34" fill="#e94560" stroke="#e94560"/>
+    <line x1="76" y1="12" x2="76" y2="56" stroke="#e0e0e0" stroke-width="4.5"/>
+    <line x1="76" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+  </svg>`},
+  ntc:{name:'Termistor NTC',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="24" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <rect x="24" y="20" width="72" height="28" rx="4" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="96" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <text x="60" y="39" text-anchor="middle" fill="#53c28b" font-size="14" font-family="sans-serif" font-weight="bold">-t°</text>
+  </svg>`},
+  ptc:{name:'Termistor PTC',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="24" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <rect x="24" y="20" width="72" height="28" rx="4" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="96" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <text x="60" y="39" text-anchor="middle" fill="#f5a623" font-size="14" font-family="sans-serif" font-weight="bold">+t°</text>
+  </svg>`},
+  led:{name:'LED',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="26" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <polygon points="26,12 26,56 74,34" fill="#f5a623" stroke="#f5a623"/>
+    <line x1="74" y1="12" x2="74" y2="56" stroke="#e0e0e0" stroke-width="4.5"/>
+    <line x1="74" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="80" y1="46" x2="102" y2="20" stroke="#f5a623" stroke-width="2.5" marker-end="url(#al2)"/>
+    <line x1="92" y1="52" x2="114" y2="26" stroke="#f5a623" stroke-width="2.5" marker-end="url(#al2)"/>
+    <defs><marker id="al2" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#f5a623"/></marker></defs>
+  </svg>`},
+  pot:{name:'Potenciómetro',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="24" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <rect x="24" y="20" width="72" height="28" rx="4" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="96" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="60" y1="20" x2="60" y2="6" stroke="#53c28b" stroke-width="2.5"/>
+    <polygon points="52,20 68,20 60,6" fill="#53c28b"/>
+  </svg>`},
+  res:{name:'Resistencia fija',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="34" x2="24" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <rect x="24" y="20" width="72" height="28" rx="4" stroke="#a0a0b0" stroke-width="2.5"/>
+    <line x1="96" y1="34" x2="120" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+  </svg>`},
+  transistor:{name:'Transistor NPN',svg:`<svg viewBox="0 0 120 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="64" cy="34" r="28" stroke="#e0e0e0" stroke-width="2"/>
+    <line x1="0" y1="34" x2="46" y2="34" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="46" y1="18" x2="46" y2="50" stroke="#e0e0e0" stroke-width="3.5"/>
+    <line x1="46" y1="22" x2="82" y2="8" stroke="#e0e0e0" stroke-width="2.5"/>
+    <line x1="46" y1="46" x2="82" y2="60" stroke="#e0e0e0" stroke-width="2.5"/>
+    <polygon points="70,56 82,60 78,48" fill="#e0e0e0"/>
+  </svg>`},
+};
+
+// ── PREGUNTAS ─────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  // ── VERDADERO / FALSO (10) ───────────────────────────────────────────────
+  {type:'tf',text:'En una LDR, a mayor cantidad de luz, mayor es su resistencia eléctrica.',answer:false,points:10,
+   fc:'¡Correcto! En la LDR, a más luz → resistencia DISMINUYE. La luz libera electrones en el semiconductor, facilitando el paso de corriente.',
+   fw:'Incorrecto. En una LDR, a más luz → la resistencia DISMINUYE. La fotorresistencia funciona al contrario de lo que parece intuitivo.'},
+  {type:'tf',text:'Un termistor NTC aumenta su resistencia cuando sube la temperatura.',answer:false,points:10,
+   fc:'¡Bien! NTC = Negative Temperature Coefficient: al subir la temperatura, su resistencia BAJA.',
+   fw:'Incorrecto. NTC = Coeficiente de Temperatura Negativo. Al subir la temperatura, su resistencia DISMINUYE.'},
+  {type:'tf',text:'La fórmula del tiempo de carga completa de un condensador es t = 5 · R · C.',answer:true,points:10,
+   fc:'¡Perfecto! t = 5·R·C equivale a 5 constantes de tiempo (τ = R·C), cuando el condensador alcanza el 99,3% de su carga.',
+   fw:'Incorrecto. La fórmula correcta ES t = 5·R·C. Representa 5 constantes de tiempo τ, cuando la carga es prácticamente completa.'},
+  {type:'tf',text:'La unidad microfaradio (μF) equivale a 10⁻⁶ Faradios.',answer:true,points:10,
+   fc:'¡Correcto! El prefijo micro (μ) equivale siempre a 10⁻⁶. Por tanto 1 μF = 0,000001 F.',
+   fw:'Incorrecto. El prefijo micro (μ) equivale a 10⁻⁶. Por tanto 1 μF = 10⁻⁶ F.'},
+  {type:'tf',text:'Un diodo en polarización inversa deja pasar toda la corriente.',answer:false,points:10,
+   fc:'¡Correcto! En polarización inversa el diodo BLOQUEA la corriente. Solo conduce en directa (ánodo+ respecto al cátodo).',
+   fw:'Incorrecto. En polarización inversa el diodo BLOQUEA la corriente. Esa es su función como válvula unidireccional.'},
+  {type:'tf',text:'Un potenciómetro es una resistencia cuyo valor no se puede modificar.',answer:false,points:10,
+   fc:'¡Bien! El potenciómetro es una RESISTENCIA VARIABLE: su cursor deslizante permite cambiar el valor.',
+   fw:'Incorrecto. El potenciómetro ES una resistencia variable. Tiene un cursor que permite ajustar su valor.'},
+  {type:'tf',text:'El silicio se comporta como aislante a temperaturas muy bajas.',answer:true,points:10,
+   fc:'¡Correcto! A baja temperatura los electrones no tienen energía para saltar a la banda de conducción, y el silicio actúa como aislante.',
+   fw:'Incorrecto. A temperaturas muy bajas el silicio SÍ se comporta como aislante: los electrones no tienen energía para conducir.'},
+  {type:'tf',text:'Los semiconductores son la base de la fabricación de los microprocesadores.',answer:true,points:10,
+   fc:'¡Exacto! Los microprocesadores contienen miles de millones de transistores fabricados con silicio, un semiconductor.',
+   fw:'Incorrecto. Los semiconductores (silicio) son el material base de todos los transistores que forman los microprocesadores.'},
+  {type:'tf',text:'El cátodo de un diodo se identifica con una franja de color en el componente real.',answer:true,points:10,
+   fc:'¡Correcto! En los diodos reales, una franja (plateada o gris) marca el cátodo, por donde sale la corriente convencional.',
+   fw:'Incorrecto. El cátodo SÍ se identifica con una franja de color (normalmente plateada) en uno de los extremos del diodo.'},
+  {type:'tf',text:'Los condensadores electrolíticos pueden conectarse con cualquier polaridad sin dañarse.',answer:false,points:10,
+   fc:'¡Correcto! Los electrolíticos son POLARIZADOS: tienen + y –. Invertir la polaridad puede dañarlos o hacerlos explotar.',
+   fw:'Incorrecto. Los condensadores electrolíticos son POLARIZADOS. Conectarlos al revés puede dañarlos o incluso hacerlos explotar.'},
+
+  // ── ELECCIÓN MÚLTIPLE — conceptos (8) ───────────────────────────────────
+  {type:'mc',text:'¿Qué siglas corresponden a una resistencia cuyo valor varía con la luz?',options:['NTC','PTC','LDR','LED'],answer:2,points:15,
+   fc:'¡Correcto! LDR = Light Dependent Resistor (Resistencia Dependiente de la Luz).',
+   fw:'Incorrecto. La respuesta es LDR. NTC y PTC son termistores; LED es un diodo emisor de luz.'},
+  {type:'mc',text:'¿En qué unidad del SI se mide la capacidad de un condensador?',options:['Ohmio (Ω)','Voltio (V)','Faradio (F)','Amperio (A)'],answer:2,points:15,
+   fc:'¡Perfecto! El Faradio (F) es la unidad de capacidad eléctrica, en honor a Michael Faraday.',
+   fw:'Incorrecto. La capacidad se mide en Faradios (F). El ohmio mide resistencia, el voltio tensión y el amperio intensidad.'},
+  {type:'mc',text:'¿Cuál es la función principal de un diodo en un circuito de corriente continua?',options:['Almacenar energía eléctrica','Amplificar la señal de corriente','Permitir el paso de corriente en un solo sentido','Variar la resistencia del circuito'],answer:2,points:15,
+   fc:'¡Correcto! El diodo es una válvula unidireccional: conduce cuando el ánodo está a mayor potencial que el cátodo.',
+   fw:'Incorrecto. El diodo permite el paso de corriente en UN SOLO SENTIDO. Los condensadores almacenan energía; los transistores amplifican.'},
+  {type:'mc',text:'¿Para qué se usa un potenciómetro en un amplificador de sonido?',options:['Para rectificar la corriente alterna','Para controlar el volumen','Para almacenar la señal de audio','Para convertir CC en CA'],answer:1,points:15,
+   fc:'¡Correcto! El potenciómetro actúa como divisor de tensión, controlando cuánta señal llega al amplificador y, por tanto, el volumen.',
+   fw:'Incorrecto. El potenciómetro controla el VOLUMEN actuando como divisor de tensión.'},
+  {type:'mc',text:'¿Cuál de estos materiales es el más usado en la fabricación de semiconductores?',options:['Cobre','Silicio','Aluminio','Carbono'],answer:1,points:15,
+   fc:'¡Bien! El silicio (Si) es el semiconductor más usado. Su estructura cristalina lo hace ideal para transistores y circuitos integrados.',
+   fw:'Incorrecto. El silicio (Si) es el semiconductor más utilizado. El cobre y el aluminio son buenos conductores, no semiconductores.'},
+  {type:'mc',text:'¿Por qué los semiconductores se consideran el "nuevo petróleo" del siglo XXI?',options:['Porque se extraen del subsuelo como el petróleo','Porque son un recurso estratégico esencial para la economía y tecnología global','Porque se usan como combustible en centrales eléctricas','Porque su precio nunca varía en el mercado'],answer:1,points:15,
+   fc:'¡Excelente! Los semiconductores son estratégicos: toda la industria tecnológica, automovilística y de defensa depende de ellos.',
+   fw:'Incorrecto. Son el "nuevo petróleo" porque son un RECURSO ESTRATÉGICO: sin semiconductores se paraliza la industria mundial.'},
+  {type:'mc',text:'¿Cuál es una aplicación real de las LDR para mejorar la eficiencia energética?',options:['Controlar la velocidad de un motor eléctrico','Encender y apagar automáticamente el alumbrado público según la luz solar','Medir la temperatura en una caldera industrial','Almacenar energía solar en baterías'],answer:1,points:15,
+   fc:'¡Correcto! La LDR detecta la luz ambiental: cuando baja (anochecer), enciende las farolas automáticamente, ahorrando energía.',
+   fw:'Incorrecto. La LDR controla el alumbrado público: se enciende solo cuando la luz natural es insuficiente.'},
+  {type:'mc',text:'¿Cómo ha influido la miniaturización de semiconductores en nuestra vida diaria?',options:['Ha hecho los dispositivos más grandes y caros','Ha permitido dispositivos más pequeños, potentes y accesibles como el smartphone','No ha cambiado significativamente los dispositivos electrónicos','Solo ha afectado a los ordenadores militares'],answer:1,points:15,
+   fc:'¡Perfecto! Gracias a la miniaturización, hoy llevamos en el bolsillo más potencia de cálculo que los ordenadores que llevaron al hombre a la Luna.',
+   fw:'Incorrecto. La miniaturización ha dado lugar a smartphones, smartwatches, portátiles… que han transformado completamente nuestra vida.'},
+
+  // ── PROBLEMAS DE CONDENSADORES (5) ───────────────────────────────────────
+  {type:'mc',
+   text:'Un condensador de 2200 μF se carga a través de una resistencia de 1000 Ω. Usando t = 5·R·C, ¿cuánto tarda en cargarse completamente?',
+   extra:'<strong>Datos:</strong> C = 2200 μF = 2200 × 10⁻⁶ F &nbsp;|&nbsp; R = 1000 Ω<br>t = 5 × 1000 × 0,0022 = ?',
+   options:['5,5 s','11 s','22 s','2,2 s'],answer:1,points:20,
+   fc:'¡Correcto! t = 5 × 1000 × 0,0022 = 11 s. Recuerda: 2200 μF = 0,0022 F.',
+   fw:'Incorrecto. t = 5 · R · C = 5 × 1000 × 0,0022 = 11 s. El error más común es olvidar convertir μF a Faradios (÷ 1 000 000).'},
+  {type:'mc',
+   text:'Queremos que un circuito tarde exactamente 10 segundos en cargarse. Si el condensador es de 1000 μF, ¿qué resistencia debemos usar?',
+   extra:'<strong>Despeja R:</strong> t = 5·R·C → R = t / (5·C)<br>R = 10 / (5 × 0,001) = ?',
+   options:['500 Ω','1000 Ω','2000 Ω','200 Ω'],answer:2,points:20,
+   fc:'¡Exacto! R = 10 / (5 × 0,001) = 10 / 0,005 = 2000 Ω. Hay que despejar R de la fórmula t = 5·R·C.',
+   fw:'Incorrecto. Despejando: R = t / (5·C) = 10 / (5 × 0,001) = 10 / 0,005 = 2000 Ω.'},
+  {type:'mc',
+   text:'Un flash de cámara usa un condensador que se carga en 5 segundos. Si la resistencia del circuito es de 500 Ω, ¿cuál es la capacidad del condensador?',
+   extra:'<strong>Despeja C:</strong> t = 5·R·C → C = t / (5·R)<br>C = 5 / (5 × 500) = ?',
+   options:['0,001 F = 1000 μF','0,01 F = 10 000 μF','0,002 F = 2000 μF','0,0005 F = 500 μF'],answer:2,points:20,
+   fc:'¡Correcto! C = 5 / (5 × 500) = 5 / 2500 = 0,002 F = 2000 μF.',
+   fw:'Incorrecto. Despejando C: C = t / (5·R) = 5 / (5 × 500) = 5 / 2500 = 0,002 F = 2000 μF.'},
+  {type:'mc',
+   text:'Un condensador de 4700 μF se descarga a través de una resistencia de 220 Ω. ¿Cuánto tarda en descargarse completamente? (usa t = 5·R·C)',
+   extra:'<strong>Datos:</strong> C = 4700 μF = 0,0047 F &nbsp;|&nbsp; R = 220 Ω<br>t = 5 × 220 × 0,0047 = ?',
+   options:['3,17 s','5,17 s','7,17 s','10 s'],answer:1,points:20,
+   fc:'¡Correcto! t = 5 × 220 × 0,0047 = 5,17 s. La fórmula de descarga es la misma que la de carga.',
+   fw:'Incorrecto. t = 5 · R · C = 5 × 220 × 0,0047 = 5,17 s. La descarga usa la misma fórmula que la carga.'},
+  {type:'mc',
+   text:'Si en un circuito RC duplicamos tanto R como C, ¿qué le ocurre al tiempo de carga?',
+   extra:'<strong>Razona con la fórmula:</strong> t = 5·R·C<br>Si R→2R y C→2C: t_nuevo = 5·(2R)·(2C) = ?',
+   options:['Se duplica','Se multiplica por 4','Se mantiene igual','Se divide entre 2'],answer:1,points:20,
+   fc:'¡Perfecto! t_nuevo = 5·(2R)·(2C) = 4·(5·R·C) = 4·t. Al doblar R y C, el tiempo se CUADRUPLICA.',
+   fw:'Incorrecto. t_nuevo = 5·(2R)·(2C) = 4·(5·R·C). Al doblar R y C, el tiempo se multiplica por 4, no por 2.'},
+
+  // ── SÍMBOLOS sin nombre (6) ───────────────────────────────────────────────
+  {type:'symbol',text:'¿Cuál de estos símbolos corresponde a una LDR?',correctSymbol:'ldr',set:['ldr','ntc','pot','res'],points:20,
+   fc:'¡Correcto! La LDR es una resistencia con flechas entrantes que representan la incidencia de luz sobre el componente.',
+   fw:'Incorrecto. La LDR tiene el símbolo de resistencia con flechas de luz apuntando hacia dentro. Las flechas la distinguen de otros tipos.'},
+  {type:'symbol',text:'Identifica el símbolo del condensador:',correctSymbol:'cap',set:['cap','diode','ldr','res'],points:20,
+   fc:'¡Bien! El condensador son dos líneas paralelas (las placas o armaduras) separadas, que representan los dos conductores y el dieléctrico.',
+   fw:'Incorrecto. El condensador se dibuja con dos líneas paralelas (placas). Sin las líneas paralelas no hay condensador.'},
+  {type:'symbol',text:'¿Cuál de estos símbolos representa un diodo rectificador?',correctSymbol:'diode',set:['diode','led','transistor','cap'],points:20,
+   fc:'¡Perfecto! El diodo: triángulo (ánodo) apuntando hacia una barra vertical (cátodo). La dirección indica el sentido de conducción.',
+   fw:'Incorrecto. El diodo rectificador es el triángulo con barra. El triángulo apunta en la dirección del flujo de corriente convencional.'},
+  {type:'symbol',text:'Selecciona el símbolo que corresponde a un termistor NTC:',correctSymbol:'ntc',set:['ntc','ptc','res','ldr'],points:20,
+   fc:'¡Correcto! El NTC muestra "-t°" dentro del rectángulo, indicando que la resistencia BAJA al subir la temperatura.',
+   fw:'Incorrecto. El NTC lleva "-t°" en su interior. El signo negativo recuerda que la resistencia disminuye con el calor.'},
+  {type:'symbol',text:'¿Cuál es el símbolo del LED?',correctSymbol:'led',set:['led','diode','ntc','pot'],points:20,
+   fc:'¡Excelente! El LED = símbolo de diodo + dos flechas saliendo, que representan la luz (fotones) emitida al conducir corriente.',
+   fw:'Incorrecto. El LED tiene el símbolo del diodo + dos flechas hacia fuera (luz emitida). Sin las flechas sería un diodo rectificador normal.'},
+  {type:'symbol',text:'¿Cuál de estos símbolos corresponde a un potenciómetro?',correctSymbol:'pot',set:['pot','res','ntc','ldr'],points:20,
+   fc:'¡Bien! El potenciómetro: resistencia con una flecha (cursor) que sale del centro. Tiene 3 terminales: dos extremos y el cursor.',
+   fw:'Incorrecto. El potenciómetro es una resistencia con flecha central (cursor deslizante). La flecha es la clave diferenciadora.'},
+
+  // ── CLASIFICACIÓN activo/pasivo y lineal/variable (9) ───────────────────
+  {type:'mc',text:'¿Cómo se clasifica una resistencia fija dentro de los componentes electrónicos?',options:['Componente activo y resistor lineal','Componente pasivo y resistor lineal','Componente activo y resistor variable','Componente pasivo y semiconductor'],answer:1,points:15,
+   fc:'¡Correcto! La resistencia fija es PASIVA (no amplifica ni genera energía) y LINEAL (su valor no varía con ninguna magnitud externa).',
+   fw:'Incorrecto. La resistencia fija es PASIVA y LINEAL (valor constante). Los componentes activos como los transistores sí pueden amplificar.'},
+  {type:'mc',text:'¿En qué categoría se incluye una LDR?',options:['Resistor lineal y componente activo','Resistor no lineal (variable) y componente pasivo','Componente activo y semiconductor','Condensador y componente pasivo'],answer:1,points:15,
+   fc:'¡Exacto! La LDR es un resistor NO LINEAL o VARIABLE (su resistencia depende de la luz) y PASIVO (no genera ni amplifica energía).',
+   fw:'Incorrecto. La LDR es un resistor VARIABLE porque su resistencia cambia con la luz, y PASIVO porque no amplifica.'},
+  {type:'mc',text:'¿Cuál de estos componentes es considerado ACTIVO?',options:['Condensador cerámico','Resistencia fija','Transistor','Potenciómetro'],answer:2,points:15,
+   fc:'¡Correcto! El transistor es ACTIVO: puede amplificar señales y controlar corrientes mayores con una señal pequeña, usando alimentación externa.',
+   fw:'Incorrecto. El transistor es el componente ACTIVO. Los otros tres (condensador, resistencia, potenciómetro) son pasivos.'},
+  {type:'mc',text:'Un condensador electrolítico se clasifica como:',options:['Componente activo — almacena carga eléctrica','Componente pasivo — almacena energía en campo eléctrico','Resistor variable — cambia con la temperatura','Semiconductor activo — amplifica señales'],answer:1,points:15,
+   fc:'¡Bien! El condensador es PASIVO: almacena energía en el campo eléctrico entre sus placas, pero no amplifica ni genera señales.',
+   fw:'Incorrecto. El condensador es PASIVO. Almacena energía pero no puede amplificar. Solo los activos (transistores) amplifican.'},
+  {type:'mc',text:'¿Cuál es la diferencia principal entre un resistor lineal y uno no lineal?',options:['El lineal usa silicio; el no lineal usa cobre','El lineal tiene valor constante; el no lineal varía con temperatura, luz u otra magnitud','El lineal es siempre más caro que el no lineal','El lineal es activo; el no lineal es pasivo'],answer:1,points:15,
+   fc:'¡Correcto! Resistor lineal = valor constante. Resistor no lineal = su valor cambia con una magnitud externa (luz, temperatura…).',
+   fw:'Incorrecto. LINEAL → valor constante. NO LINEAL → varía con luz (LDR), temperatura (NTC/PTC) u otras magnitudes.'},
+  {type:'mc',text:'¿Un diodo LED es un componente activo o pasivo?',options:['Activo, porque emite luz al amplificar la señal','Pasivo, porque solo transforma energía eléctrica en luz sin amplificar','Activo, porque siempre necesita un transistor para funcionar','Pasivo, porque puede funcionar sin ninguna fuente de energía'],answer:1,points:15,
+   fc:'¡Correcto! El LED es PASIVO: transforma energía eléctrica en luz, pero no amplifica señales ni controla corrientes.',
+   fw:'Incorrecto. El LED es PASIVO. Transforma energía en luz pero no amplifica. La amplificación es exclusiva de los componentes activos.'},
+  {type:'mc',text:'Un termistor NTC se clasifica como:',options:['Resistor lineal y componente activo','Resistor no lineal, componente pasivo, sensible a la temperatura','Componente activo y semiconductor de potencia','Condensador variable y componente pasivo'],answer:1,points:15,
+   fc:'¡Exacto! El NTC es NO LINEAL (varía con la temperatura), PASIVO (no amplifica) y semiconductor sensible a la temperatura.',
+   fw:'Incorrecto. El NTC es NO LINEAL porque su valor cambia con la temperatura, y PASIVO porque no amplifica.'},
+  {type:'mc',text:'¿Cuáles de estos son componentes PASIVOS?',options:['Transistor, diodo LED y circuito integrado','Resistencia fija, condensador y bobina','Microprocesador, transistor y diodo Zener','Amplificador operacional, transistor y MOSFET'],answer:1,points:15,
+   fc:'¡Perfecto! Resistencia, condensador y bobina son los tres grandes componentes PASIVOS: no amplifican ni necesitan alimentación para su función básica.',
+   fw:'Incorrecto. Los componentes PASIVOS clásicos son: resistencia, condensador y bobina. Los transistores, amplificadores y CI son activos.'},
+  {type:'mc',text:'¿Qué significa que un componente sea "activo" en electrónica?',options:['Que consume mucha energía eléctrica','Que puede controlar o amplificar señales usando una fuente de alimentación externa','Que solo funciona con corriente alterna','Que tiene un valor de resistencia muy bajo'],answer:1,points:15,
+   fc:'¡Correcto! ACTIVO = puede amplificar o controlar señales: entrega más potencia a la salida que la recibida en la entrada, usando energía externa.',
+   fw:'Incorrecto. ACTIVO significa que puede amplificar o controlar señales usando una fuente externa. Ejemplos: transistores, circuitos integrados.'},
+];
+
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+let playerName='',currentQ=0,score=0,correctCount=0,answered=false,results=[];
+const TOTAL=QUESTIONS.length;
+
+function startGame(){
+  const n=document.getElementById('playerName').value.trim();
+  if(!n){document.getElementById('playerName').style.borderColor='var(--acc)';document.getElementById('playerName').focus();return;}
+  playerName=n;
+  document.getElementById('hudName').textContent=n.length>14?n.slice(0,13)+'…':n;
+  currentQ=0;score=0;correctCount=0;results=[];answered=false;
+  showScreen('screen-quiz');renderQuestion();
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function renderQuestion(){
+  const q=QUESTIONS[currentQ];
+  answered=false;
+  document.getElementById('btnNext').disabled=true;
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('hudQ').textContent=(currentQ+1)+'/'+TOTAL;
+  document.getElementById('hudPts').textContent=score;
+  document.getElementById('hudCorrect').textContent=correctCount;
+  document.getElementById('progressFill').style.width=Math.round((currentQ/TOTAL)*100)+'%';
+  const lbl={'tf':'Verdadero / Falso','mc':'Elección múltiple','symbol':'Identifica el símbolo'};
+  let html=`<div class="q-type-badge">${lbl[q.type]}</div>`;
+  html+=`<div class="q-text">${q.text}</div>`;
+  if(q.extra) html+=`<div class="problema-box">${q.extra}</div>`;
+  html+=`<div class="pts-badge">⚡ ${q.points} puntos</div>`;
+  if(q.type==='tf'){
+    html+=`<div class="tf-wrap">
+      <button class="tf-btn" onclick="answerTF(this,true)">✅ VERDADERO</button>
+      <button class="tf-btn" onclick="answerTF(this,false)">❌ FALSO</button>
+    </div>`;
+  } else if(q.type==='mc'){
+    html+='<div class="options">';
+    ['A','B','C','D'].forEach((l,i)=>{
+      html+=`<button class="option-btn" onclick="answerMC(this,${i})"><span class="opt-letter">${l}</span>${q.options[i]}</button>`;
+    });
+    html+='</div>';
+  } else if(q.type==='symbol'){
+    html+='<div class="symbol-grid">';
+    q.set.forEach(sk=>{
+      html+=`<button class="sym-btn" data-key="${sk}" onclick="answerSym(this,'${sk}','${q.correctSymbol}')">
+        ${SYM[sk].svg}
+        <span class="sym-label">${SYM[sk].name}</span>
+      </button>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('qCard').innerHTML=html;
+}
+
+function showFeedback(correct,q){
+  const fb=document.getElementById('feedback');
+  fb.innerHTML=(correct?'<strong>✅ ¡Correcto!</strong> ':'<strong>❌ Incorrecto.</strong> ')+(correct?q.fc:q.fw);
+  fb.className='feedback '+(correct?'correct':'wrong')+' show';
+  if(correct){
+    const p=document.getElementById('ptsPopup');
+    p.textContent='+'+q.points+' pts';p.classList.add('show');
+    setTimeout(()=>p.classList.remove('show'),900);
+  }
+  const btn=document.getElementById('btnNext');
+  btn.disabled=false;
+  btn.textContent=currentQ<TOTAL-1?'Siguiente pregunta →':'Ver resultados →';
+}
+
+function answerTF(btn,val){
+  if(answered)return;answered=true;
+  const q=QUESTIONS[currentQ];const ok=val===q.answer;
+  document.querySelectorAll('.tf-btn').forEach(b=>b.disabled=true);
+  btn.classList.add(ok?'correct':'wrong');
+  if(ok){score+=q.points;correctCount++;}
+  results.push({q:q.text,correct:ok,type:q.type});
+  showFeedback(ok,q);
+}
+
+function answerMC(btn,idx){
+  if(answered)return;answered=true;
+  const q=QUESTIONS[currentQ];const ok=idx===q.answer;
+  document.querySelectorAll('.option-btn').forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add('correct');});
+  if(!ok)btn.classList.add('wrong');
+  if(ok){score+=q.points;correctCount++;}
+  results.push({q:q.text,correct:ok,type:q.type});
+  showFeedback(ok,q);
+}
+
+function answerSym(btn,chosen,ck){
+  if(answered)return;answered=true;
+  const q=QUESTIONS[currentQ];const ok=chosen===ck;
+  // Revelamos los nombres SOLO tras responder
+  document.querySelectorAll('.sym-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.key===ck)b.classList.add('correct');
+  });
+  if(!ok)btn.classList.add('wrong');
+  if(ok){score+=q.points;correctCount++;}
+  results.push({q:q.text,correct:ok,type:q.type});
+  showFeedback(ok,q);
+}
+
+function nextQuestion(){currentQ++;if(currentQ>=TOTAL){showResults();return;}renderQuestion();}
+
+function showResults(){
+  document.getElementById('progressFill').style.width='100%';
+  const total_pts=QUESTIONS.reduce((a,q)=>a+q.points,0);
+  const pct=Math.round((score/total_pts)*100);
+  document.getElementById('resultStars').textContent=pct>=80?'⭐⭐⭐':pct>=60?'⭐⭐':pct>=40?'⭐':'';
+  document.getElementById('resultGrade').textContent=score+' pts';
+  document.getElementById('resultName').textContent=playerName;
+  const nota=pct>=90?'Sobresaliente 🏆':pct>=75?'Notable 🎯':pct>=60?'Bien ✅':pct>=50?'Suficiente':'Insuficiente — ¡Sigue practicando!';
+  document.getElementById('resultSub').textContent=nota+' · '+pct+'% del total';
+  document.getElementById('sCorrect').textContent=correctCount;
+  document.getElementById('sWrong').textContent=TOTAL-correctCount;
+  document.getElementById('sPct').textContent=pct+'%';
+  const tl={'tf':'V/F','mc':'Múltiple','symbol':'Símbolo'};
+  document.getElementById('reviewList').innerHTML=results.map((r,i)=>`
+    <div class="review-item">
+      <div class="review-icon ${r.correct?'ok':'ko'}">${r.correct?'✓':'✗'}</div>
+      <span><strong>P${i+1} [${tl[r.type]}]:</strong> ${r.q.length>72?r.q.slice(0,71)+'…':r.q}</span>
+    </div>`).join('');
+  showScreen('screen-results');
+}
+
+function exportPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const total_pts=QUESTIONS.reduce((a,q)=>a+q.points,0);
+  const pct=Math.round((score/total_pts)*100);
+  const fecha=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const nota=pct>=90?'Sobresaliente':pct>=75?'Notable':pct>=60?'Bien':pct>=50?'Suficiente':'Insuficiente';
+  doc.setFillColor(26,26,46);doc.rect(0,0,210,297,'F');
+  doc.setFillColor(22,33,62);doc.rect(0,0,210,48,'F');
+  doc.setTextColor(233,69,96);doc.setFontSize(22);doc.setFont('helvetica','bold');
+  doc.text('ELECTROQUIZ',105,18,{align:'center'});
+  doc.setTextColor(160,160,176);doc.setFontSize(11);doc.setFont('helvetica','normal');
+  doc.text('Repaso · Electrónica Analógica · 3º ESO',105,28,{align:'center'});
+  doc.setTextColor(224,224,224);doc.setFontSize(13);doc.setFont('helvetica','bold');
+  doc.text('Alumno: '+playerName,20,42);
+  doc.setTextColor(160,160,176);doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text('Fecha: '+fecha,190,42,{align:'right'});
+  [{label:'PUNTUACIÓN',val:score+'/'+total_pts,c:[233,69,96]},{label:'ACIERTOS',val:correctCount+'/'+TOTAL,c:[83,194,139]},{label:'ERRORES',val:(TOTAL-correctCount)+'/'+TOTAL,c:[245,166,35]},{label:'PORCENTAJE',val:pct+'%',c:pct>=60?[83,194,139]:[233,69,96]}].forEach((b,i)=>{
+    const x=20+i*47;
+    doc.setFillColor(30,42,74);doc.roundedRect(x,56,43,22,3,3,'F');
+    doc.setTextColor(...b.c);doc.setFontSize(15);doc.setFont('helvetica','bold');
+    doc.text(b.val,x+21.5,66,{align:'center'});
+    doc.setTextColor(160,160,176);doc.setFontSize(7);doc.setFont('helvetica','normal');
+    doc.text(b.label,x+21.5,74,{align:'center'});
+  });
+  doc.setFillColor(pct>=60?10:40,pct>=60?50:10,pct>=60?30:10);
+  doc.roundedRect(20,84,170,10,3,3,'F');
+  doc.setTextColor(pct>=60?83:233,pct>=60?194:69,pct>=60?139:96);
+  doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text('Calificación: '+nota,105,91,{align:'center'});
+  doc.setTextColor(233,69,96);doc.setFontSize(10);doc.setFont('helvetica','bold');
+  doc.text('DETALLE DE RESPUESTAS',20,103);
+  doc.setDrawColor(42,58,94);doc.line(20,106,190,106);
+  const tl={'tf':'V/F','mc':'Múltiple','symbol':'Símbolo'};
+  let y=112;
+  results.forEach((r,i)=>{
+    if(y>275){doc.addPage();doc.setFillColor(26,26,46);doc.rect(0,0,210,297,'F');y=20;}
+    doc.setFillColor(r.correct?10:40,r.correct?50:10,r.correct?30:10);
+    doc.roundedRect(20,y-4,170,9,2,2,'F');
+    doc.setTextColor(r.correct?83:233,r.correct?194:69,r.correct?139:96);
+    doc.setFontSize(8);doc.setFont('helvetica','bold');
+    doc.text((i+1)+'. '+(r.correct?'✓':'✗'),22,y+2);
+    doc.setTextColor(r.correct?150:200,r.correct?220:150,r.correct?180:150);
+    doc.setFont('helvetica','normal');
+    doc.text((r.q.length>74?r.q.slice(0,73)+'…':r.q),34,y+2);
+    doc.setTextColor(100,100,120);doc.text('['+tl[r.type]+']',188,y+2,{align:'right'});
+    y+=10;
+  });
+  doc.setFontSize(7);doc.setTextColor(80,80,100);
+  doc.text('Generado con ElectroQuiz · Tecnología 3º ESO · '+fecha,105,290,{align:'center'});
+  doc.save('Resultado_ElectroQuiz_'+playerName.replace(/\s+/g,'_')+'.pdf');
+}
+
+function restartGame(){currentQ=0;score=0;correctCount=0;results=[];answered=false;document.getElementById('playerName').value='';showScreen('screen-welcome');}
+</script>

@@ -1,0 +1,384 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+.board{
+  background:#fff;
+  border:3px solid #ddd;
+  border-radius:12px;
+  padding:28px 24px 32px;
+  font-family:'Nunito',sans-serif;
+  width:100%;
+  overflow-x:auto;
+}
+.board-title{
+  text-align:center;
+  font-size:1.45rem;
+  font-weight:800;
+  color:#222;
+  letter-spacing:1px;
+  margin-bottom:22px;
+  text-transform:uppercase;
+  border-bottom:2.5px solid #ddd;
+  padding-bottom:12px;
+}
+/* Layout principal: 3 columnas */
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:0 18px;
+  align-items:start;
+  min-width:700px;
+}
+/* Columna wrapper */
+.col{display:flex;flex-direction:column;gap:14px}
+
+/* BLOQUE raíz de cada columna */
+.root-label{
+  font-size:.82rem;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;text-align:center;
+  padding:7px 12px;border-radius:8px;
+  border:2px solid;
+}
+
+/* ── Colores de bloque ──────────────────────────── */
+.cl-pasivo  {background:#fff8e1;border-color:#f5a623;color:#7a4f00}
+.cl-activo  {background:#e8f5e9;border-color:#43a047;color:#1b5e20}
+.cl-semi    {background:#fce4ec;border-color:#e91e63;color:#880e4f}
+.cl-carga   {background:#e3f2fd;border-color:#1e88e5;color:#0d47a1}
+.cl-soc     {background:#f3e5f5;border-color:#8e24aa;color:#4a148c}
+
+/* NODO (caja con fondo) */
+.node{
+  border-radius:8px;padding:6px 10px;
+  font-size:.78rem;font-weight:700;
+  border:2px solid;
+  display:flex;align-items:center;gap:6px;
+  line-height:1.35;
+}
+/* Variantes de color nodo */
+.n-amber{background:#fff8e1;border-color:#f5a623;color:#7a4f00}
+.n-green{background:#e8f5e9;border-color:#43a047;color:#1b5e20}
+.n-red  {background:#ffebee;border-color:#e53935;color:#7f0000}
+.n-blue {background:#e3f2fd;border-color:#1e88e5;color:#0d47a1}
+.n-teal {background:#e0f2f1;border-color:#00897b;color:#004d40}
+.n-purple{background:#f3e5f5;border-color:#8e24aa;color:#4a148c}
+.n-gray {background:#fafafa;border-color:#9e9e9e;color:#424242}
+.n-orange{background:#fff3e0;border-color:#fb8c00;color:#7a3200}
+
+/* ÍTEM de lista */
+.item{font-size:.73rem;color:#444;line-height:1.5;display:flex;align-items:flex-start;gap:5px}
+.item::before{content:'•';font-size:.8rem;flex-shrink:0;margin-top:1px}
+.item.sub{padding-left:12px;color:#666;font-size:.7rem}
+.item.sub::before{content:'–';color:#aaa}
+
+/* SECCIÓN interna (con llave visual) */
+.section{position:relative;border-left:3px solid;padding-left:10px;margin-top:4px}
+.section.s-amber{border-color:#f5a623}
+.section.s-green{border-color:#43a047}
+.section.s-red  {border-color:#e53935}
+.section.s-blue {border-color:#1e88e5}
+.section.s-teal {border-color:#00897b}
+.section.s-purple{border-color:#8e24aa}
+.section.s-gray {border-color:#9e9e9e}
+.section.s-orange{border-color:#fb8c00}
+
+.sec-title{font-size:.72rem;font-weight:800;letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase}
+.st-amber{color:#f5a623} .st-green{color:#43a047} .st-red{color:#e53935}
+.st-blue{color:#1e88e5}  .st-teal{color:#00897b}  .st-purple{color:#8e24aa}
+.st-gray{color:#757575}  .st-orange{color:#fb8c00}
+
+/* FÓRMULA destacada */
+.formula{
+  background:#e3f2fd;border:1.5px dashed #1e88e5;border-radius:6px;
+  padding:4px 8px;font-size:.75rem;font-weight:700;color:#0d47a1;
+  text-align:center;margin-top:5px;font-family:monospace;letter-spacing:.5px
+}
+
+/* SÍMBOLO SVG inline */
+.sym-row{display:flex;align-items:center;gap:8px;margin:3px 0}
+.sym-row svg{flex-shrink:0}
+.sym-row span{font-size:.7rem;color:#555}
+
+/* Divisor horizontal */
+.hdiv{border:none;border-top:1.5px dashed #e0e0e0;margin:8px 0}
+
+/* Bloque de fórmula-problema */
+.prob-box{
+  background:#e8eaf6;border:1.5px solid #5c6bc0;border-radius:7px;
+  padding:6px 9px;font-size:.72rem;color:#1a237e;margin-top:5px;line-height:1.7
+}
+.prob-box strong{font-weight:800}
+</style>
+
+<div class="board">
+  <div class="board-title">Electrónica básica: componentes</div>
+
+  <div class="main-grid">
+
+    <!-- ══════════ COL 1: PASIVOS ══════════ -->
+    <div class="col">
+      <div class="root-label cl-pasivo">⚡ Componentes pasivos</div>
+      <div class="item" style="font-size:.7rem;color:#888;justify-content:center">No amplifican · No necesitan alimentación externa</div>
+
+      <!-- RESISTORES -->
+      <div class="node n-amber">🔲 Resistores</div>
+      <div class="item sub">Oposición al flujo de corriente</div>
+
+      <div class="section s-amber" style="margin-top:2px">
+        <div class="sec-title st-amber">Lineales (valor fijo)</div>
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="16" y2="14" stroke="#555" stroke-width="2"/>
+            <rect x="16" y="6" width="48" height="16" rx="3" stroke="#f5a623" stroke-width="1.8"/>
+            <line x1="64" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+          </svg>
+          <span>Resistencia fija · Película de carbono / metal</span>
+        </div>
+        <div class="item sub">Valor constante (Ω)</div>
+      </div>
+
+      <div class="section s-orange" style="margin-top:6px">
+        <div class="sec-title st-orange">No lineales (variables)</div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 34" width="80" height="34" fill="none">
+            <line x1="0" y1="14" x2="14" y2="14" stroke="#555" stroke-width="2"/>
+            <rect x="14" y="6" width="48" height="16" rx="3" stroke="#fb8c00" stroke-width="1.8"/>
+            <line x1="62" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+            <line x1="26" y1="30" x2="38" y2="18" stroke="#fb8c00" stroke-width="2" marker-end="url(#ax)"/>
+            <line x1="40" y1="30" x2="52" y2="18" stroke="#fb8c00" stroke-width="2" marker-end="url(#ax)"/>
+            <defs><marker id="ax" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#fb8c00"/></marker></defs>
+          </svg>
+          <span><strong>LDR</strong> · ↑ luz → ↓ R</span>
+        </div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="14" y2="14" stroke="#555" stroke-width="2"/>
+            <rect x="14" y="6" width="48" height="16" rx="3" stroke="#e53935" stroke-width="1.8"/>
+            <line x1="62" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+            <text x="38" y="18" text-anchor="middle" fill="#e53935" font-size="9" font-family="sans-serif" font-weight="bold">-t°</text>
+          </svg>
+          <span><strong>NTC</strong> · ↑ T → ↓ R</span>
+        </div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="14" y2="14" stroke="#555" stroke-width="2"/>
+            <rect x="14" y="6" width="48" height="16" rx="3" stroke="#1e88e5" stroke-width="1.8"/>
+            <line x1="62" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+            <text x="38" y="18" text-anchor="middle" fill="#1e88e5" font-size="9" font-family="sans-serif" font-weight="bold">+t°</text>
+          </svg>
+          <span><strong>PTC</strong> · ↑ T → ↑ R</span>
+        </div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="14" y2="14" stroke="#555" stroke-width="2"/>
+            <rect x="14" y="6" width="48" height="16" rx="3" stroke="#43a047" stroke-width="1.8"/>
+            <line x1="62" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+            <line x1="38" y1="6" x2="38" y2="0" stroke="#43a047" stroke-width="1.8"/>
+            <polygon points="32,6 44,6 38,0" fill="#43a047"/>
+          </svg>
+          <span><strong>Potenciómetro</strong> · 3 terminales · control volumen</span>
+        </div>
+      </div>
+
+      <hr class="hdiv"/>
+
+      <!-- CONDENSADORES -->
+      <div class="node n-red">🔋 Condensadores</div>
+      <div class="item sub">Almacenan energía en campo eléctrico · Faradios (F)</div>
+      <div class="item sub">1 μF = 10⁻⁶ F &nbsp;|&nbsp; 1 nF = 10⁻⁹ F &nbsp;|&nbsp; 1 pF = 10⁻¹² F</div>
+
+      <div class="section s-gray" style="margin-top:4px">
+        <div class="sec-title st-gray">No polarizados</div>
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="32" y2="14" stroke="#555" stroke-width="2"/>
+            <line x1="32" y1="4" x2="32" y2="24" stroke="#43a047" stroke-width="3.5"/>
+            <line x1="48" y1="4" x2="48" y2="24" stroke="#43a047" stroke-width="3.5"/>
+            <line x1="48" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+          </svg>
+          <span>Cerámico / película · valores pF–nF</span>
+        </div>
+      </div>
+
+      <div class="section s-red" style="margin-top:5px">
+        <div class="sec-title st-red">Polarizados</div>
+        <div class="sym-row">
+          <svg viewBox="0 0 80 28" width="80" height="28" fill="none">
+            <line x1="0" y1="14" x2="30" y2="14" stroke="#555" stroke-width="2"/>
+            <line x1="30" y1="4" x2="30" y2="24" stroke="#e53935" stroke-width="3.5"/>
+            <path d="M48,4 Q56,14 48,24" stroke="#e53935" stroke-width="3" fill="none"/>
+            <line x1="48" y1="14" x2="80" y2="14" stroke="#555" stroke-width="2"/>
+            <text x="22" y="8" fill="#e53935" font-size="9" font-weight="bold" font-family="sans-serif">+</text>
+          </svg>
+          <span>Electrolítico · μF–mF · ¡respetar polaridad!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ COL 2: ACTIVOS + SEMICONDUCTORES ══════════ -->
+    <div class="col">
+      <div class="root-label cl-activo">⚙ Componentes activos</div>
+      <div class="item" style="font-size:.7rem;color:#888;justify-content:center">Amplifican / controlan señales · Necesitan alimentación</div>
+
+      <!-- TRANSISTOR -->
+      <div class="node n-green">🔌 Transistor</div>
+      <div class="section s-green" style="margin-top:2px">
+        <div class="item">Componente activo por excelencia</div>
+        <div class="item sub">Amplifica señales eléctricas</div>
+        <div class="item sub">3 terminales: Base · Colector · Emisor</div>
+        <div class="item sub">Tipos: NPN / PNP · BJT / MOSFET</div>
+        <div class="item sub">Miles de millones forman un microprocesador</div>
+        <div class="sym-row" style="margin-top:4px">
+          <svg viewBox="0 0 80 48" width="80" height="48" fill="none">
+            <circle cx="44" cy="24" r="20" stroke="#43a047" stroke-width="1.5"/>
+            <line x1="0" y1="24" x2="30" y2="24" stroke="#555" stroke-width="2"/>
+            <line x1="30" y1="14" x2="30" y2="34" stroke="#555" stroke-width="2.5"/>
+            <line x1="30" y1="17" x2="54" y2="8" stroke="#555" stroke-width="2"/>
+            <line x1="30" y1="31" x2="54" y2="40" stroke="#555" stroke-width="2"/>
+            <polygon points="46,37 54,40 50,32" fill="#43a047"/>
+          </svg>
+          <span>Símbolo transistor NPN</span>
+        </div>
+      </div>
+
+      <hr class="hdiv"/>
+
+      <!-- SEMICONDUCTORES -->
+      <div class="root-label cl-semi" style="margin-top:4px">💎 Semiconductores (base)</div>
+      <div class="item" style="font-size:.7rem;color:#888;justify-content:center">Conductividad controlable · "Nuevo petróleo" del s. XXI</div>
+
+      <div class="section s-red" style="margin-top:4px">
+        <div class="sec-title st-red">Naturaleza</div>
+        <div class="item"><strong>Silicio (Si)</strong> · más usado · estructura cristalina</div>
+        <div class="item sub">Germanio (Ge) · aplicaciones especiales</div>
+        <div class="item">Materiales intrínsecos vs extrínsecos</div>
+        <div class="item">Aislante a T° muy baja · conductor a T° alta</div>
+      </div>
+
+      <div class="section s-purple" style="margin-top:5px">
+        <div class="sec-title st-purple">Dopaje</div>
+        <div class="item"><strong>Tipo N</strong> · electrones libres (átomos pentavalentes)</div>
+        <div class="item"><strong>Tipo P</strong> · huecos positivos (átomos trivalentes)</div>
+        <div class="item sub">Controla el flujo eléctrico</div>
+      </div>
+
+      <div class="section s-red" style="margin-top:5px">
+        <div class="sec-title st-red">Junción P-N</div>
+        <div class="item">Unión de tipo P y tipo N → <strong>Diodo</strong></div>
+        <div class="item sub">Zona de deplexión · barrera de potencial</div>
+      </div>
+
+      <hr class="hdiv"/>
+
+      <!-- TECNOLOGÍA Y SOCIEDAD -->
+      <div class="root-label cl-soc" style="margin-top:2px">🌍 Tecnología y sociedad</div>
+      <div class="section s-purple" style="margin-top:6px">
+        <div class="item">Semiconductores = recurso <strong>estratégico global</strong></div>
+        <div class="item sub">Escasez 2020–22 → parálisis automoción y electrónica</div>
+        <div class="item">LDR → <strong>alumbrado público automático</strong> (ahorro energético)</div>
+        <div class="item">Miniaturización → smartphones, wearables, portátiles</div>
+        <div class="item sub">Ley de Moore: potencia × 2 cada ~18 meses</div>
+      </div>
+    </div>
+
+    <!-- ══════════ COL 3: DIODOS + CARGA/DESCARGA ══════════ -->
+    <div class="col">
+
+      <!-- DIODOS -->
+      <div class="root-label cl-activo">⬛ Diodos</div>
+      <div class="item" style="font-size:.7rem;color:#888;justify-content:center">Semiconductores activos · unión P-N</div>
+
+      <div class="section s-green" style="margin-top:4px">
+        <div class="sec-title st-green">Función y estructura</div>
+        <div class="item">Corriente en <strong>un solo sentido</strong> (rectificación)</div>
+        <div class="item sub">Ánodo (+) → Cátodo (−)</div>
+        <div class="item sub">Polarización directa: conduce</div>
+        <div class="item sub">Polarización inversa: bloquea</div>
+        <div class="item sub">Franja en el cuerpo real = cátodo (K)</div>
+      </div>
+
+      <div class="section s-teal" style="margin-top:5px">
+        <div class="sec-title st-teal">Tipos y símbolos</div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 32" width="80" height="32" fill="none">
+            <line x1="0" y1="16" x2="18" y2="16" stroke="#555" stroke-width="2"/>
+            <polygon points="18,5 18,27 50,16" fill="#e53935" stroke="#e53935"/>
+            <line x1="50" y1="5" x2="50" y2="27" stroke="#555" stroke-width="3"/>
+            <line x1="50" y1="16" x2="80" y2="16" stroke="#555" stroke-width="2"/>
+            <text x="10" y="29" fill="#43a047" font-size="8" font-family="sans-serif">A</text>
+            <text x="53" y="29" fill="#e53935" font-size="8" font-family="sans-serif">K</text>
+          </svg>
+          <span><strong>Rectificador</strong> · convierte CA → CC</span>
+        </div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 32" width="80" height="32" fill="none">
+            <line x1="0" y1="16" x2="16" y2="16" stroke="#555" stroke-width="2"/>
+            <polygon points="16,5 16,27 48,16" fill="#fb8c00" stroke="#fb8c00"/>
+            <line x1="48" y1="5" x2="48" y2="27" stroke="#555" stroke-width="3"/>
+            <line x1="48" y1="16" x2="80" y2="16" stroke="#555" stroke-width="2"/>
+            <line x1="53" y1="22" x2="68" y2="8" stroke="#fb8c00" stroke-width="1.8" marker-end="url(#al3)"/>
+            <line x1="62" y1="25" x2="77" y2="11" stroke="#fb8c00" stroke-width="1.8" marker-end="url(#al3)"/>
+            <defs><marker id="al3" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#fb8c00"/></marker></defs>
+          </svg>
+          <span><strong>LED</strong> · emite luz al conducir · componente pasivo</span>
+        </div>
+
+        <div class="sym-row">
+          <svg viewBox="0 0 80 32" width="80" height="32" fill="none">
+            <line x1="0" y1="16" x2="18" y2="16" stroke="#555" stroke-width="2"/>
+            <polygon points="18,5 18,27 50,16" fill="#8e24aa" stroke="#8e24aa"/>
+            <line x1="50" y1="5" x2="56" y2="12" stroke="#555" stroke-width="2.5"/>
+            <line x1="50" y1="27" x2="56" y2="20" stroke="#555" stroke-width="2.5"/>
+            <line x1="50" y1="16" x2="80" y2="16" stroke="#555" stroke-width="2"/>
+          </svg>
+          <span><strong>Zener</strong> · tensión de referencia</span>
+        </div>
+      </div>
+
+      <hr class="hdiv"/>
+
+      <!-- CARGA Y DESCARGA -->
+      <div class="root-label cl-carga">📐 Carga y descarga del condensador</div>
+
+      <div class="section s-blue" style="margin-top:6px">
+        <div class="sec-title st-blue">Fórmula principal</div>
+        <div class="formula">t = 5 · R · C</div>
+        <div class="item sub" style="margin-top:4px">t en segundos · R en ohmios (Ω) · C en faradios (F)</div>
+        <div class="item sub">Aplica igual a carga y a descarga</div>
+        <div class="item sub">5 constantes de tiempo τ = R·C → carga ≈ 99,3%</div>
+      </div>
+
+      <div class="section s-blue" style="margin-top:6px">
+        <div class="sec-title st-blue">Despejes clave</div>
+        <div class="formula">R = t / (5 · C)</div>
+        <div class="formula" style="margin-top:4px">C = t / (5 · R)</div>
+        <div class="item sub" style="margin-top:4px">Si R × 2 → t × 2 (relación lineal)</div>
+        <div class="item sub">Si R × 2 y C × 2 → t × 4 (cuadrática)</div>
+      </div>
+
+      <div class="section s-teal" style="margin-top:6px">
+        <div class="sec-title st-teal">Ejemplos resueltos</div>
+        <div class="prob-box">
+          <strong>C = 2200 μF, R = 1000 Ω</strong><br>
+          t = 5 × 1000 × 0,0022 = <strong>11 s</strong>
+        </div>
+        <div class="prob-box" style="margin-top:4px">
+          <strong>Flash: t = 5 s, R = 500 Ω → C = ?</strong><br>
+          C = 5 / (5 × 500) = <strong>2000 μF</strong>
+        </div>
+        <div class="prob-box" style="margin-top:4px">
+          <strong>t = 10 s, C = 1000 μF → R = ?</strong><br>
+          R = 10 / (5 × 0,001) = <strong>2000 Ω</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
